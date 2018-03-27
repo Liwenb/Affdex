@@ -1,0 +1,342 @@
+﻿<Window x:Class="SMGExpression.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
+        xmlns:local="clr-namespace:SMGExpression"
+        xmlns:affdexMe="clr-namespace:SMGExpression;assembly="
+        Title="SMGExpression"    
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        Height="1080" Width="1920"
+        ResizeMode="NoResize" 
+         WindowStartupLocation="CenterScreen" WindowStyle="None" Background="Transparent"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+    xmlns:mycontrol="clr-namespace:SMGExpression.Charts">
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}" x:Key="close">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Opacity" Value="0.8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Background="{TemplateBinding Background}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SliderThumbStyle" TargetType="{x:Type Thumb}">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <!--手动绘制图标-->
+                        <Grid>
+                            <Ellipse Height="15" Width="4" Fill="Blue" Margin="0,3,0,0"></Ellipse>
+                            <Ellipse Height="15" Width="12" Fill="Blue" Margin="-0,-4,0,0"></Ellipse>
+                        </Grid>
+                        <!--<Image Source="图标.png"></Image>-->
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Storyboard x:Key="autoFade">
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <DoubleAnimation BeginTime="0:0:0.0" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
+            <DoubleAnimation BeginTime="0:0:5.0" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.5"/>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:5.5" Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Hidden</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        <local:ValueToProcessConverter x:Key="ValueToProcessConverter"/>
+        <Style TargetType="{x:Type Label}" x:Key="appShotLocLabelStyle">
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+        <Style TargetType="{x:Type ButtonBase}" x:Key="CustomButtonStyle">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF2778BB" Offset="0.51"/>
+                        <GradientStop Color="#FF2683C5" Offset="0.484"/>
+                        <GradientStop Color="#FF8CD4FF" Offset="1"/>
+                        <GradientStop Color="#FF1973AE" Offset="0.497"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderBrush" Value="#FF2B5F91"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="MinWidth" Value="20"/>
+            <Setter Property="FontSize" Value="11"/>
+
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Rectangle Stroke="{TemplateBinding BorderBrush}" RadiusX="15" RadiusY="15" Fill="{TemplateBinding Background}"/>
+                            <Rectangle VerticalAlignment="Top" Height="10" Margin="7,2,7,1" RadiusX="10" RadiusY="10">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#11FFFFFF" Offset="1"/>
+                                        <GradientStop Color="#B2FFFFFF" Offset="0"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle x:Name="rectangle" RadiusX="15" RadiusY="15" Fill="White" Margin="1" Opacity="0"/>
+                            <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Margin="{TemplateBinding Padding}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" TargetName="rectangle" Value="0.2"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" TargetName="rectangle" Value="0.3"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Fill" TargetName="rectangle" Value="#666"/>
+                                <Setter Property="Opacity" TargetName="rectangle" Value="0.6"/>
+                                <Setter Property="Opacity" TargetName="contentPresenter" Value="0.3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ButtonBase}" x:Key="PointsOnButtonStyle">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF3CB371" Offset="0.51"/>
+                        <GradientStop Color="#FF3CB371" Offset="0.484"/>
+                        <GradientStop Color="#FF3CB371" Offset="1"/>
+                        <GradientStop Color="#FF1973AE" Offset="0.497"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderBrush" Value="#FF2B5F91"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="MinWidth" Value="20"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Rectangle Stroke="{TemplateBinding BorderBrush}" RadiusX="15" RadiusY="15" Fill="{TemplateBinding Background}"/>
+                            <Rectangle VerticalAlignment="Top" Height="10" Margin="7,2,7,1" RadiusX="10" RadiusY="10">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#11FFFFFF" Offset="1"/>
+                                        <GradientStop Color="#B2FFFFFF" Offset="0"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle x:Name="rectangle" RadiusX="15" RadiusY="15" Fill="White" Margin="1" Opacity="0"/>
+                            <ContentPresenter x:Name="contentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Margin="{TemplateBinding Padding}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" TargetName="rectangle" Value="0.2"/>
+                            </Trigger>
+                            <Trigger Property
+                                     ="IsPressed" Value="True">
+                                <Setter Property="Opacity" TargetName="rectangle" Value="0.3"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Fill" TargetName="rectangle" Value="#666"/>
+                                <Setter Property="Opacity" TargetName="rectangle" Value="0.6"/>
+                                <Setter Property="Opacity" TargetName="contentPresenter" Value="0.3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Name="gridMainDisplay" Margin="0,0,0,0" >
+        <Grid.Background>
+            <ImageBrush ImageSource="Lib/底.png" Stretch="Fill"/>
+        </Grid.Background>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,35,28,0">
+            <Button Name="zxhBtn" Style="{StaticResource close}" Click="Button_Click_1" Width="25" Height="5" >
+                <Button.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Button.RenderTransform>
+                <Button.Background>
+                    <ImageBrush ImageSource="Resources/图层11@2x(1).png"/>
+                </Button.Background>
+            </Button>
+            <Button Name="closeBtnE" Style="{StaticResource close}" Margin="13 0 0 0" Height="25" Width="25" Click="Button_Click">
+                <Button.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Button.RenderTransform>
+                <Button.Background>
+                    <ImageBrush ImageSource="Resources/图层12@2x.png"/>
+                </Button.Background>
+            </Button>
+        </StackPanel>
+        <Grid  Margin="20,90,20,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="1" Grid.Column="0">
+                        <Grid Name="gridAffdexFaceDisplay" ShowGridLines="True" VerticalAlignment="Stretch" >
+                            <Image Name="cameraDisplay" Visibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
+
+                            <Image Name="logoBackground" Margin="40,40,40,85" Width="auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                            Height="auto" Source="Resources\AffectivaLogo1.png" Visibility="Collapsed"/>
+
+                            <affdexMe:DrawingCanvas x:Name="canvas" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Label Name="appShotLocLabel" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource appShotLocLabelStyle}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="1">
+                        <Grid Name="gridAffdexFaceDisplay1" ShowGridLines="True" VerticalAlignment="Stretch" >
+                            <Image Name="cameraDisplay1" Visibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
+
+                            <Image Name="logoBackground1" Margin="40,40,40,85" Width="auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                            Height="auto" Source="Resources\AffectivaLogo1.png" Visibility="Collapsed"/>
+
+                            <affdexMe:DrawingCanvas1 x:Name="canvas1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Label Name="appShotLocLabel1" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource appShotLocLabelStyle}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+                <Grid Grid.Column="2">
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="1">
+                        <Grid Name="gridAffdexFaceDisplay2" ShowGridLines="True" VerticalAlignment="Stretch" >
+                            <Image Name="cameraDisplay2" Visibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
+
+                            <Image Name="logoBackground2" Margin="40,40,40,85" Width="auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                            Height="auto" Source="Resources\AffectivaLogo1.png" Visibility="Collapsed"/>
+
+                            <affdexMe:DrawingCanvas2 x:Name="canvas2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Label Name="appShotLocLabel2" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource appShotLocLabelStyle}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+                <Grid Grid.Column="3">
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="1">
+                        <Grid Name="gridAffdexFaceDisplay3" ShowGridLines="True" VerticalAlignment="Stretch" >
+                            <Image Name="cameraDisplay3" Visibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
+
+                            <Image Name="logoBackground3" Margin="40,40,40,85" Width="auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                            Height="auto" Source="Resources\AffectivaLogo1.png" Visibility="Collapsed"/>
+
+                            <affdexMe:DrawCanvas3 x:Name="canvas3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Label Name="appShotLocLabel3" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource appShotLocLabelStyle}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" x:Name="Chartc">
+                    <!--<mycontrol:SeriesTitlesControl></mycontrol:SeriesTitlesControl>-->
+                </Grid>
+                <Grid Grid.Column="1" x:Name="ChartOne">
+                    <!--<mycontrol:BarSideBySide2DControl></mycontrol:BarSideBySide2DControl>-->
+                </Grid>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel HorizontalAlignment="Right" x:Name="radioStp" Visibility="Collapsed" Margin="0,10,0,0" Grid.Row="0" VerticalAlignment="Top" Orientation="Horizontal">
+                        <RadioButton GroupName="ready" Checked="joy_Checked" IsChecked="True" Click="joy_Checked" IsEnabled="True" x:Name="joy" Foreground="White">开心</RadioButton>
+                        <RadioButton GroupName="ready" Checked="joy_Checked" x:Name="sadness" Foreground="White">悲伤</RadioButton>
+                        <RadioButton GroupName="ready"  Checked="joy_Checked" x:Name="anger" Foreground="White">愤怒</RadioButton>
+                        <RadioButton GroupName="ready"  Checked="joy_Checked" x:Name="digust" Foreground="White">失望</RadioButton>
+                        <RadioButton GroupName="ready"  Checked="joy_Checked" x:Name="surprise" Foreground="White">惊讶</RadioButton>
+                        <RadioButton GroupName="ready"  Checked="joy_Checked" x:Name="fear" Foreground="White">害怕</RadioButton>
+                    </StackPanel>
+                    <Grid x:Name="ChartTwo" Grid.Row="1">
+                        
+                    </Grid>
+                    <!--<mycontrol:CustomMarker2DControl></mycontrol:CustomMarker2DControl>-->
+                </Grid>
+
+            </Grid>
+            <Grid Name="gridContentDisplay" DockPanel.Dock="Top">
+                <StackPanel Name="cornerLogo" Orientation="Vertical" Background="Transparent" Height="75" HorizontalAlignment="Stretch" VerticalAlignment="Top" >
+                </StackPanel>
+            </Grid>
+            <DockPanel VerticalAlignment="Bottom">
+                <DockPanel.Background>
+                    <SolidColorBrush Color="Gray" Opacity="0.2"/>
+                </DockPanel.Background>
+
+                <Grid HorizontalAlignment="Center">
+                    <GroupBox Margin="0,5,0,0"  Height="40" VerticalAlignment="Stretch" BorderBrush="Transparent" BorderThickness="0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Button Name="btnStartCamera" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" Visibility="Collapsed" VerticalAlignment="Top" Width="80" Content="Start"/>
+                            <Button Name="btnResetCamera" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Top" Width="80" Content="Reset" Visibility="Collapsed" />
+                            <Button Name="Metrics" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Top" Width="80" Content="Show Metrics" Visibility="Collapsed"/>
+                            <Button Name="Points" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Top" Width="80" Content="Show Points" Visibility="Collapsed"/>
+                            <Button Name="Emojis" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Top" Width="80" Content="Show Emojis" Visibility="Collapsed"/>
+                            <Button Name="Appearance" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Top" Width="110" Content="Show Appearance" Visibility="Collapsed"/>
+                            <Button Name="btnAppShot" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Top" Width="100" Content="Take Screenshot" Visibility="Collapsed"/>
+                            <Button Name="btnChooseWin" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Top" Width="80" Content="Select Metrics" Click="btnChooseWin_Click" Visibility="Collapsed"/>
+                            <Button Name="btnStopCamera" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" Visibility="Collapsed" VerticalAlignment="Top" Width="80" Content="Stop" />
+                            <Button Name="btnExit" Style="{StaticResource CustomButtonStyle}" HorizontalAlignment="Center" Margin="0,0,5,0" Visibility="Collapsed" VerticalAlignment="Bottom" Width="80" Content="Exit" />
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Window>  

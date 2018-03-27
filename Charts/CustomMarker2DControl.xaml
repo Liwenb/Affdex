@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="SMGExpression.Charts.CustomMarker2DControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxdb="http://schemas.devexpress.com/winfx/2008/xaml/demobase"
+    xmlns:dxc="http://schemas.devexpress.com/winfx/2008/xaml/charts"
+             Loaded="ChartsDemoModule_ModuleAppear">
+    <Grid>
+        <dxc:ChartControl Name="chart" 
+                              BorderThickness="0"
+                              ToolTipEnabled="False" Background="#010206"  >
+            <dxc:XYDiagram2D PaneOrientation="Vertical">
+                <dxc:XYDiagram2D.DefaultPane >
+                    <dxc:Pane DomainBrush="#010206" />
+                </dxc:XYDiagram2D.DefaultPane>
+                <dxc:XYDiagram2D.AxisY>
+                    <dxc:AxisY2D Brush="White"  >
+                        <dxc:AxisY2D.Range>
+                            <dxc:AxisRange MinValue="0" />
+                        </dxc:AxisY2D.Range>
+                        <dxc:AxisY2D.Title>
+                            <!--<dxc:AxisTitle Content="个数" FontSize="12" Foreground="White"></dxc:AxisTitle>-->
+                            <dxc:AxisTitle Content="笑点分布(人次/分钟)" FontSize="12" Foreground="White"></dxc:AxisTitle>
+                        </dxc:AxisY2D.Title>
+                        <dxc:AxisY2D.Label>
+                            <dxc:AxisLabel Foreground="White"/>
+                        </dxc:AxisY2D.Label>
+                    </dxc:AxisY2D>
+                </dxc:XYDiagram2D.AxisY>
+
+                <dxc:XYDiagram2D.AxisX>
+                    <dxc:AxisX2D Brush="White">
+                        <dxc:AxisX2D.Label>
+                            <dxc:AxisLabel   Foreground="White"/>
+                        </dxc:AxisX2D.Label>
+                    </dxc:AxisX2D>
+                </dxc:XYDiagram2D.AxisX>
+
+                <dxc:XYDiagram2D.Series>
+                    <dxc:LineSeries2D x:Name="分数"
+                                              DisplayName="分数"
+                                              AnimationAutoStartMode="SetStartState" >
+                        <dxc:LineSeries2D.Label>
+                            <dxc:SeriesLabel ConnectorVisible="True" Visible="True"/>
+                        </dxc:LineSeries2D.Label>
+                        <dxc:LineSeries2D.Points>
+                            <!--<dxc:SeriesPoint Argument="8:00" Value="12" />
+                                    <dxc:SeriesPoint Argument="9:00" Value="16" />
+                                    <dxc:SeriesPoint Argument="10:00" Value="9" />
+                                    <dxc:SeriesPoint Argument="11:00" Value="7" />
+                                    <dxc:SeriesPoint Argument="12:00" Value="13" />
+                                    <dxc:SeriesPoint Argument="13：00" Value="17" />-->
+                        </dxc:LineSeries2D.Points>
+                        <dxc:LineSeries2D.PointOptions>
+                            <dxc:PointOptions PointView="Values">
+                                <dxc:PointOptions.ValueNumericOptions>
+                                    <dxc:NumericOptions Format="Number" Precision="0" />
+                                </dxc:PointOptions.ValueNumericOptions>
+                            </dxc:PointOptions>
+                        </dxc:LineSeries2D.PointOptions>
+                    </dxc:LineSeries2D>
+                </dxc:XYDiagram2D.Series>
+            </dxc:XYDiagram2D>
+            <dxc:ChartControl.Titles>
+                <dxc:Title Dock="Top" HorizontalAlignment="Center"  Foreground="White">笑点分布图</dxc:Title>
+            </dxc:ChartControl.Titles>
+        </dxc:ChartControl>
+    </Grid>
+</UserControl>
+
